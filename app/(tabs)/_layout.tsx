@@ -1,5 +1,5 @@
 import {Tabs} from "expo-router";
-import {TABS} from "@/constants/data";
+import {tabs} from "@/constants/data";
 import {Image, View} from "react-native";
 // eslint-disable-next-line import/no-named-as-default
 import clsx from "clsx";
@@ -44,7 +44,7 @@ const TabLayout = () => {
 
             }}>
 
-            {TABS.map((tab) => (
+            {tabs.map((tab) => (
                 <Tabs.Screen
                     key={tab.name}
                     name={tab.name}

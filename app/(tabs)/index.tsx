@@ -1,43 +1,28 @@
 import "@/global.css"
-import {Image, Text, View} from "react-native";
+import { Text, View } from "react-native";
+import {Link} from "expo-router";
 import {SafeAreaView as RNSafeAreaView} from "react-native-safe-area-context";
 import {styled} from "nativewind";
-import images from "@/constants/images";
-import {HOME_BALANCE, HOME_USER} from "@/constants/data";
-import {icons} from "@/constants/icons";
-import {formatCurrency} from "@/lib/utils";
-import dayjs from "dayjs";
-import ListHeading from "@/components/ListHeading";
-import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 
 export default function App() {
     const SafeAreaView = styled(RNSafeAreaView);
     return (
         <SafeAreaView className="flex-1 p-5 bg-background">
-          <View className="home-header">
-            <View className="home-user">
-                <Image source={images.avatar} className="home-avatar" />
-                <Text className="home-user-name" > {HOME_USER.name}</Text>
-            </View>
-              <Image source={icons.add} className="home-add-icon"/>
-          </View>
-            <View className="home-balance-card">
-                <Text className="home-balance-label">Balance</Text>
+            <Text className="text-4xl font-bold text-success">
+                Home
+            </Text>
+            <Text className="text-4xl font-sans-extrabold text-success">
+                Home
+            </Text>
+            <Link href="/onboarding" className="mt-4 rounded-md text-xl font-bold bg-primary p-4 text-white">
+                Go to onboarding</Link>
+            <Link href="/(auth)/sign-in" className="mt-4 rounded-md text-xl font-bold bg-primary p-4 text-white">
+                Go to Sign in</Link>
+            <Link href="/(auth)/sign-up" className="mt-4 rounded-md text-xl font-bold bg-primary p-4 text-white">
+                Go to sign up</Link>
 
-                <View className="home-balance-row">
-                    <Text className="home-balance-amount"> {formatCurrency(HOME_BALANCE.amount)}</Text>
-                    <Text className="home-balance-date">
-                        {dayjs(HOME_BALANCE.nextRenewalDate).format("MM/DD")}
-                    </Text>
-                </View>
-            </View>
-            <View>
-                <ListHeading title="Upcoming"/>
-                <UpcomingSubscriptionCard/>
-            </View>
-            <View>
-                <ListHeading title="All Subscription"/>
-            </View>
+
+
         </SafeAreaView>
     );
 }
