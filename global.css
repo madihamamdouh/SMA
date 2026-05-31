@@ -119,7 +119,7 @@
     }
 
     .upcoming-card {
-        @apply mr-4 w-44 rounded-2xl border border-black/10 bg-background p-4;
+        @apply mr-4 w-49 rounded-2xl border border-black/10 bg-background p-4;
     }
 
     .upcoming-row {
