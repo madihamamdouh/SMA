@@ -49,7 +49,7 @@ export default function App() {
                                 renderItem={({item}) => (<UpcomingSubscriptionCard {...item}/>)}
                                 keyExtractor={(item) => item.id}
                                 horizontal={true}
-                                showsVerticalScrollIndicator={false}
+                                showsHorizontalScrollIndicator={false}
                                 ListEmptyComponent={<Text className="home-empty-state">No Upcoming Renewal</Text>}
 
                             />
