@@ -44,12 +44,6 @@
     --spacing-24: 96px;
     --spacing-30: 120px;
 
-    --font-sans: sans-regular;
-    --font-sans-light: sans-light;
-    --font-sans-medium: sans-medium;
-    --font-sans-semibold: sans-semibold;
-    --font-sans-bold: sans-bold;
-    --font-sans-extrabold: sans-extrabold;
 }
 
 @layer components {
@@ -78,7 +72,7 @@
     }
 
     .home-avatar {
-        @apply size-16 rounded-full;
+        @apply size-16 rounded-full ;
     }
 
     .home-user-name {
@@ -86,7 +80,7 @@
     }
 
     .home-add-icon {
-        @apply size-12;
+        @apply size-12 p-2 rounded-full border border-border;
     }
 
     .home-balance-card {
