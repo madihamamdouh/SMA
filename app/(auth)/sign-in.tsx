@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-import {View, Text} from 'react-native'
-import React from 'react'
-import {Link} from "expo-router";
-
-const SignIn = () => {
-    return (
-        <View>
-            <Text>SignIn</Text>
-            <Link href="/(auth)/sign-up" >Create Account</Link>
-        </View>
-    )
-}
-export default SignIn
-=======
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useSignIn } from "@clerk/expo";
@@ -289,4 +274,3 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
->>>>>>> master
