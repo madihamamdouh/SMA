@@ -260,11 +260,11 @@
     }
 
     .auth-wordmark {
-        @apply text-3xl font-sans-extrabold text-primary;
+        @apply text-3xl font-sans-extrabold text-primary tracking-[4px];
     }
 
     .auth-wordmark-sub {
-        @apply -mt-1 text-xs font-sans-semibold uppercase tracking-[1px] text-muted-foreground;
+        @apply -mt-1 text-xs  font-sans-semibold uppercase tracking-[1px] text-muted-foreground;
     }
 
     .auth-title {

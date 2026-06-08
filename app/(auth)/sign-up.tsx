@@ -2,19 +2,37 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth, useSignUp } from "@clerk/expo";
 import { type Href, Link, useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, Text } from "react-native";
+import { SafeAreaView as RNSSafeAreaView } from "react-native-safe-area-context";
+import { styled } from "nativewind";
+
+const SafeAreaView = styled(RNSSafeAreaView);
 
 export default function SignUp() {
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isSignedIn } = useAuth();
   const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [code, setCode] = React.useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+
+  // Validation states
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+
+  // Client-side validation
+  const emailValid =
+    emailAddress.length === 0 ||
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
+  const passwordValid = password.length === 0 || password.length >= 8;
+  const formValid =
+    emailAddress.length > 0 && password.length >= 8 && emailValid;
 
   const handleSubmit = async () => {
+    if (!formValid) return;
+
     const { error } = await signUp.password({
       emailAddress,
       password,
@@ -36,17 +54,19 @@ export default function SignUp() {
         // Redirect the user to the home page after signing up
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
-            // Handle pending session tasks
-            // See https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
             console.log(session?.currentTask);
             return;
           }
 
-          const url = decorateUrl("/");
+          const url = decorateUrl("/(tabs)");
           if (url.startsWith("http")) {
-            window.location.href = url;
+            if (typeof window !== "undefined") {
+              window.location.href = url;
+            } else {
+              router.replace("/(tabs)" as Href);
+            }
           } else {
-            router.push(url as Href);
+            router.replace(url as Href);
           }
         },
       });
@@ -66,180 +86,183 @@ export default function SignUp() {
     signUp.missingFields.length === 0
   ) {
     return (
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.title}>
-          Verify your account
-        </ThemedText>
-        <TextInput
-          style={styles.input}
-          value={code}
-          placeholder="Enter your verification code"
-          placeholderTextColor="#666666"
-          onChangeText={(code) => setCode(code)}
-          keyboardType="numeric"
-        />
-        {errors.fields.code && (
-          <ThemedText style={styles.error}>
-            {errors.fields.code.message}
-          </ThemedText>
-        )}
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            fetchStatus === "fetching" && styles.buttonDisabled,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleVerify}
-          disabled={fetchStatus === "fetching"}
-        >
-          <ThemedText style={styles.buttonText}>Verify</ThemedText>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            styles.secondaryButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={() => signUp.verifications.sendEmailCode()}
-        >
-          <ThemedText style={styles.secondaryButtonText}>
-            I need a new code
-          </ThemedText>
-        </Pressable>
-      </ThemedView>
+    <SafeAreaView className="auth-safe-area">
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    className="auth-screen"
+                >
+                    <ScrollView
+                        className="auth-scroll"
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View className="auth-content">
+                            {/* Branding */}
+                            <View className="auth-brand-block">
+                                <View className="auth-logo-wrap">
+                                    <View className="auth-logo-mark">
+                                        <Text className="auth-logo-mark-text">R</Text>
+                                    </View>
+                                    <View>
+                                        <Text className="auth-wordmark">SMA</Text>
+                                        <Text className="auth-wordmark-sub">SUBSCRIPTIONS</Text>
+                                    </View>
+                                </View>
+                                <Text className="auth-title">Verify your email</Text>
+                                <Text className="auth-subtitle">
+                                    We sent a verification code to {emailAddress}
+                                </Text>
+                            </View>
+
+                            {/* Verification Form */}
+                            <View className="auth-card">
+                                <View className="auth-form">
+                                    <View className="auth-field">
+                                        <Text className="auth-label">Verification Code</Text>
+                                        <TextInput
+                                            className="auth-input"
+                                            value={code}
+                                            placeholder="Enter 6-digit code"
+                                            placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                                            onChangeText={setCode}
+                                            keyboardType="number-pad"
+                                            autoComplete="one-time-code"
+                                            maxLength={6}
+                                        />
+                                        {errors.fields.code && (
+                                            <Text className="auth-error">{errors.fields.code.message}</Text>
+                                        )}
+                                    </View>
+
+                                    <Pressable
+                                        className={`auth-button ${(!code || fetchStatus === 'fetching') && 'auth-button-disabled'}`}
+                                        onPress={handleVerify}
+                                        disabled={!code || fetchStatus === 'fetching'}
+                                    >
+                                        <Text className="auth-button-text">
+                                            {fetchStatus === 'fetching' ? 'Verifying...' : 'Verify Email'}
+                                        </Text>
+                                    </Pressable>
+
+                                    <Pressable
+                                        className="auth-secondary-button"
+                                        onPress={() => signUp.verifications.sendEmailCode()}
+                                        disabled={fetchStatus === 'fetching'}
+                                    >
+                                        <Text className="auth-secondary-button-text">Resend Code</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Sign up
-      </ThemedText>
+   <SafeAreaView className="auth-safe-area">
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                className="auth-screen"
+            >
+                <ScrollView
+                    className="auth-scroll"
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View className="auth-content">
+                        {/* Branding */}
+                        <View className="auth-brand-block">
+                            <View className="auth-logo-wrap">
+                                <View className="auth-logo-mark">
+                                    <Text className="auth-logo-mark-text">S</Text>
+                                </View>
+                                <View>
+                                    <Text className="auth-wordmark">SMA</Text>
+                                    <Text className="auth-wordmark-sub">SUBSCRIPTIONS</Text>
+                                </View>
+                            </View>
+                            <Text className="auth-title">Create your account</Text>
+                            <Text className="auth-subtitle">
+                                Start tracking your subscriptions
+                            </Text>
+                        </View>
 
-      <ThemedText style={styles.label}>Email address</ThemedText>
-      <TextInput
-        style={styles.input}
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        placeholderTextColor="#666666"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        keyboardType="email-address"
-      />
-      {errors.fields.emailAddress && (
-        <ThemedText style={styles.error}>
-          {errors.fields.emailAddress.message}
-        </ThemedText>
-      )}
-      <ThemedText style={styles.label}>Password</ThemedText>
-      <TextInput
-        style={styles.input}
-        value={password}
-        placeholder="Enter password"
-        placeholderTextColor="#666666"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      {errors.fields.password && (
-        <ThemedText style={styles.error}>
-          {errors.fields.password.message}
-        </ThemedText>
-      )}
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          (!emailAddress || !password || fetchStatus === "fetching") &&
-            styles.buttonDisabled,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={handleSubmit}
-        disabled={!emailAddress || !password || fetchStatus === "fetching"}
-      >
-        <ThemedText style={styles.buttonText}>Sign up</ThemedText>
-      </Pressable>
-      {/* For your debugging purposes. You can just console.log errors, but we put them in the UI for convenience */}
-      {errors && (
-        <ThemedText style={styles.debug}>
-          {JSON.stringify(errors, null, 2)}
-        </ThemedText>
-      )}
+                        {/* Sign-Up Form */}
+                        <View className="auth-card">
+                            <View className="auth-form">
+                                <View className="auth-field">
+                                    <Text className="auth-label">Email Address</Text>
+                                    <TextInput
+                                        className={`auth-input ${emailTouched && !emailValid && 'auth-input-error'}`}
+                                        autoCapitalize="none"
+                                        value={emailAddress}
+                                        placeholder="name@example.com"
+                                        placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                                        onChangeText={setEmailAddress}
+                                        onBlur={() => setEmailTouched(true)}
+                                        keyboardType="email-address"
+                                        autoComplete="email"
+                                    />
+                                    {emailTouched && !emailValid && (
+                                        <Text className="auth-error">Please enter a valid email address</Text>
+                                    )}
+                                    {errors.fields.emailAddress && (
+                                        <Text className="auth-error">{errors.fields.emailAddress.message}</Text>
+                                    )}
+                                </View>
 
-      <View style={styles.linkContainer}>
-        <ThemedText>Already have an account? </ThemedText>
-        <Link href="/sign-in">
-          <ThemedText type="link">Sign in</ThemedText>
-        </Link>
-      </View>
+                                <View className="auth-field">
+                                    <Text className="auth-label">Password</Text>
+                                    <TextInput
+                                        className={`auth-input ${passwordTouched && !passwordValid && 'auth-input-error'}`}
+                                        value={password}
+                                        placeholder="Create a strong password"
+                                        placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                                        secureTextEntry
+                                        onChangeText={setPassword}
+                                        onBlur={() => setPasswordTouched(true)}
+                                        autoComplete="password-new"
+                                    />
+                                    {passwordTouched && !passwordValid && (
+                                        <Text className="auth-error">Password must be at least 8 characters</Text>
+                                    )}
+                                    {errors.fields.password && (
+                                        <Text className="auth-error">{errors.fields.password.message}</Text>
+                                    )}
+                                    {!passwordTouched && (
+                                        <Text className="auth-helper">Minimum 8 characters required</Text>
+                                    )}
+                                </View>
 
-      {/* Required for sign-up flows. Clerk's bot sign-up protection is enabled by default */}
-      <View nativeID="clerk-captcha" />
-    </ThemedView>
+                                <Pressable
+                                    className={`auth-button ${(!formValid || fetchStatus === 'fetching') && 'auth-button-disabled'}`}
+                                    onPress={handleSubmit}
+                                    disabled={!formValid || fetchStatus === 'fetching'}
+                                >
+                                    <Text className="auth-button-text">
+                                        {fetchStatus === 'fetching' ? 'Creating Account...' : 'Create Account'}
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
+
+                        {/* Sign-In Link */}
+                        <View className="auth-link-row">
+                            <Text className="auth-link-copy">Already have an account?</Text>
+                            <Link href="/(auth)/sign-in" asChild>
+                                <Pressable>
+                                    <Text className="auth-link">Sign In</Text>
+                                </Pressable>
+                            </Link>
+                        </View>
+
+                        {/* Required for Clerk's bot protection */}
+                        <View nativeID="clerk-captcha" />
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    gap: 12,
-  },
-  title: {
-    marginBottom: 8,
-  },
-  label: {
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: "#fff",
-  },
-  button: {
-    backgroundColor: "#0a7ea4",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonPressed: {
-    opacity: 0.7,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  secondaryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  secondaryButtonText: {
-    color: "#0a7ea4",
-    fontWeight: "600",
-  },
-  linkContainer: {
-    flexDirection: "row",
-    gap: 4,
-    marginTop: 12,
-    alignItems: "center",
-  },
-  error: {
-    color: "#d32f2f",
-    fontSize: 12,
-    marginTop: -8,
-  },
-  debug: {
-    fontSize: 10,
-    opacity: 0.5,
-    marginTop: 8,
-  },
-});
