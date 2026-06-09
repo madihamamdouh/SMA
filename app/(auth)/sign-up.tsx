@@ -85,6 +85,7 @@ export default function SignUp() {
   const handleGoBack = async () => {
     try {
       await signUp.reset();
+      router.replace("/sign-up");
       setEmailAddress("");
       setPassword("");
       setCode("");
