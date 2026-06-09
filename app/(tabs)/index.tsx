@@ -33,7 +33,11 @@ export default function App() {
     string | null
   >(null);
   const { user } = useUser();
-  const { signOut } = useClerk();
+ const dispalyName =
+    user?.firstName ||
+    user?.fullName ||
+    user?.emailAddresses[0]?.emailAddress ||
+    "User";
   return (
     <SafeAreaView className="flex-1 p-5 bg-background">
       <FlatList
@@ -41,10 +45,10 @@ export default function App() {
           <>
             <View className="home-header">
               <View className="home-user">
-                <Image source={images.avatar} className="home-avatar" />
-                <Text className="home-user-name"> {HOME_USER.name}</Text>
+                <Image source={ user?.imageUrl ?{uri: user.imageUrl} : images.avatar} className="home-avatar" />
+                <Text className="home-user-name"> {dispalyName || HOME_USER.name}</Text>
               </View>
-              <Image source={icons.add} className="home-add-icon" />
+              <Image source={icons.add } className="home-add-icon" />
             </View>
 
             <View className="home-balance-card">
@@ -75,22 +79,6 @@ export default function App() {
                   <Text className="home-empty-state">No Upcoming Renewal</Text>
                 }
               />
-            </View>
-            <View style={styles.container}>
-              <Show when="signed-out">
-                <Link href="/(auth)/sign-in">
-                  <Text>Sign in</Text>
-                </Link>
-                <Link href="/(auth)/sign-up">
-                  <Text>Sign up</Text>
-                </Link>
-              </Show>
-              <Show when="signed-in">
-                <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-                <Pressable style={styles.button} onPress={() => signOut()}>
-                  <Text style={styles.buttonText}>Sign out</Text>
-                </Pressable>
-              </Show>
             </View>
 
             <ListHeading title="All Subscriptions" />
