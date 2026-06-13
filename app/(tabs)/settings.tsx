@@ -2,6 +2,7 @@ import images from "@/constants/images";
 import { useClerk, useUser } from "@clerk/expo";
 import { styled } from "nativewind";
 import React from "react";
+import { usePostHog } from "posthog-react-native";
 import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
@@ -9,8 +10,11 @@ const Settings = () => {
   const SafeAreaView = styled(RNSafeAreaView);
   const { signOut } = useClerk();
   const { user } = useUser();
+  const posthog = usePostHog();
 
   const handleSignOut = async () => {
+    posthog.capture('user_signed_out');
+    posthog.reset();
     await signOut();
   };
   const dispalyName =

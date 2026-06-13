@@ -1,6 +1,7 @@
 import { useSignIn } from "@clerk/expo";
-import { type Href, Link, useRouter } from "expo-router";
+import { Link, useRouter, type Href } from "expo-router";
 import { styled } from "nativewind";
+import { usePostHog } from "posthog-react-native";
 import React, { useState } from "react";
 import {
      KeyboardAvoidingView,
@@ -18,6 +19,7 @@ const SafeAreaView = styled(RNSSafeAreaView);
 export default function SignI() {
   const { signIn, errors, fetchStatus } = useSignIn();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -42,10 +44,13 @@ export default function SignI() {
     });
     if (error) {
       console.error(JSON.stringify(error, null, 2));
+      posthog.capture('user_sign_in_failed', { error_code: error.code });
       return;
     }
 
     if (signIn.status === "complete") {
+      posthog.identify(emailAddress, { email: emailAddress });
+      posthog.capture('user_signed_in', { method: 'password' });
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
@@ -81,6 +86,8 @@ export default function SignI() {
     await signIn.mfa.verifyEmailCode({ code });
 
     if (signIn.status === "complete") {
+      posthog.identify(emailAddress, { email: emailAddress });
+      posthog.capture('user_signed_in', { method: 'mfa_email_code' });
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
@@ -168,7 +175,10 @@ export default function SignI() {
                   </Pressable>
                   <Pressable
                     className="auth-secondary-button"
-                    onPress={() => signIn.mfa.sendEmailCode()}
+                    onPress={() => {
+                      posthog.capture('email_verification_resent', { context: 'mfa' });
+                      signIn.mfa.sendEmailCode();
+                    }}
                     disabled={fetchStatus === "fetching"}
                   >
                     <Text className="auth-secondary-button-text">

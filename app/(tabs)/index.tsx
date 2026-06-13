@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { Link } from "expo-router";
 import { styled } from "nativewind";
 import { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 import {
   FlatList,
   Image,
@@ -33,6 +34,7 @@ export default function App() {
     string | null
   >(null);
   const { user } = useUser();
+  const posthog = usePostHog();
  const dispalyName =
     user?.firstName ||
     user?.fullName ||
@@ -90,11 +92,20 @@ export default function App() {
           <SubscriptionCard
             {...item}
             expanded={expandedSubscriptionId === item.id}
-            onPress={() =>
+            onPress={() => {
+              const isExpanding = expandedSubscriptionId !== item.id;
+              if (isExpanding) {
+                posthog.capture('subscription_card_expanded', {
+                  subscription_id: item.id,
+                  subscription_name: item.name,
+                  category: item.category,
+                  billing: item.billing,
+                });
+              }
               setExpandedSubscriptionId((currentId) =>
                 currentId === item.id ? null : item.id,
-              )
-            }
+              );
+            }}
           />
         )}
         extraData={expandedSubscriptionId}

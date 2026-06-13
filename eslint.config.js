@@ -7,4 +7,12 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
   },
+  {
+    settings: {
+      'import/resolver': {
+        typescript: true,
+        node: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+      },
+    },
+  },
 ]);

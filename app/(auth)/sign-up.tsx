@@ -2,6 +2,7 @@ import { useAuth, useSignUp } from "@clerk/expo";
 import { type Href, Link, useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React, { useState } from "react";
+import { usePostHog } from "posthog-react-native";
 import {
      KeyboardAvoidingView,
      Platform,
@@ -19,6 +20,7 @@ export default function SignUp() {
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isSignedIn } = useAuth();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -56,6 +58,11 @@ export default function SignUp() {
       code,
     });
     if (signUp.status === "complete") {
+      posthog.identify(emailAddress, {
+        email: emailAddress,
+        $set_once: { signup_date: new Date().toISOString() },
+      });
+      posthog.capture('user_signed_up', { method: 'email_password' });
       await signUp.finalize({
         // Redirect the user to the home page after signing up
         navigate: ({ session, decorateUrl }) => {
@@ -170,7 +177,10 @@ export default function SignUp() {
 
                   <Pressable
                     className="auth-secondary-button"
-                    onPress={() => signUp.verifications.sendEmailCode()}
+                    onPress={() => {
+                      posthog.capture('email_verification_resent', { context: 'signup' });
+                      signUp.verifications.sendEmailCode();
+                    }}
                     disabled={fetchStatus === "fetching"}
                   >
                     <Text className="auth-secondary-button-text">
