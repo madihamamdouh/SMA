@@ -356,7 +356,7 @@
     }
 
     .modal-container {
-        @apply mt-auto max-h-[85%] rounded-t-3xl bg-background;
+        @apply mt-auto max-h-[85%] rounded-t-3xl bg-background border border-accent;
     }
 
     .modal-header {
@@ -368,11 +368,11 @@
     }
 
     .modal-close {
-        @apply size-8 items-center justify-center rounded-full bg-muted;
+        @apply flex size-9 items-center justify-center rounded-full bg-muted pb-2;
     }
 
     .modal-close-text {
-        @apply text-lg font-sans-bold text-primary;
+        @apply text-center text-2xl font-sans-bold leading-none text-primary;
     }
 
     .modal-body {
