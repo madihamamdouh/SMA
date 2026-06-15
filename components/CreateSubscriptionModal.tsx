@@ -1,4 +1,5 @@
 import { icons } from "@/constants/icons";
+import { posthog } from "@/src/config/posthog";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -97,6 +98,11 @@ const CreateSubscriptionModal = ({
       color: CATEGORY_COLORS[category],
     });
 
+    posthog.capture("subscription_created", {
+      subscription_name: name,
+      subsscription_category: category ?? null,
+      subscription_billing: price,
+    });
     resetForm();
     onClose();
   };
