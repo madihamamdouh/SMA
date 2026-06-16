@@ -1,4 +1,4 @@
-import {icons} from "./icons";
+import { icons } from "./icons";
 
 
 export const TABS=[
@@ -53,7 +53,7 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
         plan: "Teams Plan",
         category: "Design",
         paymentMethod: "Visa ending in 8530",
-        status: "active",
+        status: "cancelled",
         startDate: "2025-03-20T10:00:00.000Z",
         price: 77.49,
         currency: "AED",
@@ -83,12 +83,12 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
         plan: "Pro Plan",
         category: "AI Tools",
         paymentMethod: "Amex ending in 1010",
-        status: "paused",
+        status: "active",
         startDate: "2025-06-27T10:00:00.000Z",
         price: 20.0,
         currency: "AED",
         billing: "Monthly",
-        renewalDate: "2026-03-27T10:00:00.000Z",
+        renewalDate: "2026-06-22T10:00:00.000Z",
         color: "#b8d4e3",
     },
     {
@@ -98,12 +98,12 @@ export const HOME_SUBSCRIPTIONS: Subscription[] = [
         plan: "Yearly Access",
         category: "Design",
         paymentMethod: "Visa ending in 7784",
-        status: "cancelled",
+        status: "active",
         startDate: "2024-04-02T10:00:00.000Z",
         price: 119.99,
         currency: "AED",
         billing: "Yearly",
-        renewalDate: "2026-04-02T10:00:00.000Z",
+        renewalDate: "2026-06-21T10:00:00.000Z",
         color: "#b8e8d0",
     },
 ];
