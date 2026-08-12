@@ -45,3 +45,5 @@ app-example
 .jks
 .env
 .env
+.idea/ 
+ .claude/

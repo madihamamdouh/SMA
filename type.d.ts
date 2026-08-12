@@ -51,6 +51,15 @@ declare global {
     interface ListHeadingProps {
         title: string;
     }
+
+    interface WeeklyBalancePoint {
+        day: string;
+        amount: number;
+    }
+
+    interface WeeklyBarChartProps {
+        data: WeeklyBalancePoint[];
+    }
 }
 
 export { };
