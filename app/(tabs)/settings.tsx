@@ -6,8 +6,9 @@ import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
+const SafeAreaView = styled(RNSafeAreaView);
+
 const Settings = () => {
-  const SafeAreaView = styled(RNSafeAreaView);
   const { signOut } = useClerk();
   const { user } = useUser();
   const posthog = usePostHog();

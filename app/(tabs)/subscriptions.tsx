@@ -1,25 +1,27 @@
 import SubscriptionCard from "@/components/SubscriptionCard";
-import { HOME_SUBSCRIPTIONS } from "@/constants/data";
 import "@/global.css";
+import { useSubscriptionStore } from "@/lib/subscriptionStore";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
 import { useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
+const SafeAreaView = styled(RNSafeAreaView);
+
 const Subscriptions = () => {
-  const SafeAreaView = styled(RNSafeAreaView);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
     string | null
   >(null);
   const posthog = usePostHog();
+  const { subscriptions } = useSubscriptionStore();
 
   const filteredSubscriptions = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return HOME_SUBSCRIPTIONS;
+    if (!query) return subscriptions;
 
-    return HOME_SUBSCRIPTIONS.filter((sub) => {
+    return subscriptions.filter((sub) => {
       const searchable = [
         sub.name,
         sub.category,
@@ -34,7 +36,7 @@ const Subscriptions = () => {
 
       return searchable.includes(query);
     });
-  }, [searchQuery]);
+  }, [searchQuery, subscriptions]);
 
   return (
     <SafeAreaView className="flex-1 bg-background p-5">

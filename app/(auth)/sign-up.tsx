@@ -128,7 +128,7 @@ export default function SignUp() {
               <View className="auth-brand-block">
                 <View className="auth-logo-wrap">
                   <View className="auth-logo-mark">
-                    <Text className="auth-logo-mark-text">R</Text>
+                    <Text className="auth-logo-mark-text">S</Text>
                   </View>
                   <View>
                     <Text className="auth-wordmark">SMA</Text>
