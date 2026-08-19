@@ -218,6 +218,9 @@
     .sub-cancel-disabled {
         @apply bg-primary/35;
     }
+    .sub-cancel-btn{
+       @apply mt-2 items-center rounded-full bg-primary py-4;
+    }
 
     .sub-cancel-text {
         @apply font-sans-bold text-background;

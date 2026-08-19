@@ -52,13 +52,18 @@ declare global {
         title: string;
     }
 
-    interface WeeklyBalancePoint {
-        day: string;
-        amount: number;
-    }
+
 
     interface WeeklyBarChartProps {
-        data: WeeklyBalancePoint[];
+        data: BarChartPoint[];
+    }
+    interface WeeklyBalancePoint{
+     day: string;
+     amount: number;
+    }
+    interface BarChartPoint{
+     label: string;
+     amount: number;
     }
 }
 

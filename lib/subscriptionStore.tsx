@@ -1,15 +1,51 @@
-import { HOME_SUBSCRIPTIONS } from '@/constants/data';
 import { create } from 'zustand';
+import { api } from './api';
 
 interface SubscriptionStore {
-  subscriptions: Subscription[];
-  addSubscription: (subscription: Subscription) => void;
-  setSubscriptions: (subscriptions: Subscription[]) => void;
+     subscriptions: Subscription[];
+     isLoading: boolean;
+     error: string | null;
+     fetchSubscriptions: (token: string) => Promise<void>;
+     addSubscription: (token: string, subscription: Partial<Subscription>) => Promise<void>;
+     setSubscriptions: (subscriptions: Subscription[]) => void;
+     updateSubscription: (token: string, id: string, data: Partial<Subscription>) => Promise<void>;
+     deleteSubscription: (token: string, id: string) => Promise<void>;
 }
 
 export const useSubscriptionStore = create<SubscriptionStore>((set) => ({
-  subscriptions: HOME_SUBSCRIPTIONS,
-  addSubscription: (subscription) =>
-    set((state) => ({ subscriptions: [subscription, ...state.subscriptions] })),
-  setSubscriptions: (subscriptions) => set({ subscriptions }),
+     subscriptions: [],
+     isLoading: false,
+     error: null,
+
+     fetchSubscriptions: async (token) => {
+          set({ isLoading: true, error: null });
+          try {
+               const data = await api.getSubscriptions(token);
+               set({ subscriptions: data, isLoading: false })
+          } catch (err) {
+               set({ error: (err as Error).message, isLoading: false });
+          }
+     },
+     addSubscription: async (token, subscription) => {
+          const created = await api.createSubscription(token, subscription);
+          set((state) => ({ subscriptions: [created, ...state.subscriptions] }));
+     },
+     setSubscriptions: (subscriptions) => set({ subscriptions }),
+
+     updateSubscription: async (token, id, data) => {
+          const updated = await api.updateSubscription(token, id, data);
+          set((state) => ({
+               subscriptions: state.subscriptions.map((sub) =>
+                    sub.id === id ? updated : sub
+               ),
+          }));
+     },
+     deleteSubscription: async (token, id) => {
+          await api.deleteSubscription(token, id);
+          set((state) => ({
+               subscriptions: state.subscriptions.filter((sub) => sub.id !== id),
+
+
+          }));
+     },
 }));
