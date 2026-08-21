@@ -4,7 +4,7 @@ import WeeklyBarChart from '@/components/WeeklyBarChart'
 import { colors } from '@/constants/theme'
 import "@/global.css"
 import { useSubscriptionStore } from '@/lib/subscriptionStore'
-import { formatCurrency } from '@/lib/utils'
+import { calculateMonthlySpend, formatCurrency } from '@/lib/utils'
 import { styled } from 'nativewind'
 import React, { useMemo } from 'react'
 import { ScrollView, Text, View } from 'react-native'
@@ -36,14 +36,9 @@ const Insights = () => {
           }));
      }, [subscriptions]);
 
-     const monthlySpend = useMemo(() => {
-          return subscriptions
-               .filter((sub) => sub.status === 'active')
-               .reduce((total, sub) => {
-                    const monthlyPrice = sub.billing === 'Yearly' ? sub.price / 12 : sub.price;
-                    return total + monthlyPrice;
-               }, 0);
-     }, [subscriptions]);
+ const monthlySpend = useMemo(
+     ()=> calculateMonthlySpend(subscriptions),[subscriptions]
+ );
      return (
           <SafeAreaView className="bg-background flex-1 p-5 ">
                <Text className="mb-5 text-3xl font-sans-bold text-primary">Monthly Insights</Text>

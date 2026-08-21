@@ -1,4 +1,4 @@
-import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime } from "@/lib/utils";
+import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime, resolveIcon } from "@/lib/utils";
 import clsx from "clsx";
 import React from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
@@ -26,7 +26,7 @@ const SubscriptionCard = ({
                style={!expanded && color ? { backgroundColor: color } : undefined}>
                <View className="sub-head">
                     <View className="sub-main">
-                         <Image source={icon} className="sub-icon" />
+                         <Image source={resolveIcon(icon)} className="sub-icon" />
                          <View className="sub-copy">
                               <Text className="sub-title" numberOfLines={1}>
                                    {name}
