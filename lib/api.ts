@@ -15,6 +15,7 @@ export async function apiRequest(
           },
      });
      if (!res.ok) {
+            console.log("Request failed:", res.status, path); 
           const error = await res.json().catch(() => ({ error: "Request Failed" }));
           throw new Error(error.error || "Request Failed");
      }
@@ -51,5 +52,8 @@ export const api = {
      deleteSubscription: async (token: string, id: string) => {
           await apiRequest(`/subscriptions/${id}`, token, { method: "DELETE" });
           return null;
-     }
+     },
+     getInsights: async (token: string)=>{
+          return apiRequest("/subscriptions/insights",token)
+     },
 };

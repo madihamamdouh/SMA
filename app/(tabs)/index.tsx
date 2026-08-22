@@ -41,6 +41,7 @@ export default function App() {
      useEffect(() => {
           (async () => {
                const token = await getToken();
+               //console.log("Token:", await getToken())
                if (!token) return;
                fetchSubscriptions(token);
           })();

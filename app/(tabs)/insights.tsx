@@ -5,40 +5,46 @@ import { colors } from '@/constants/theme'
 import "@/global.css"
 import { useSubscriptionStore } from '@/lib/subscriptionStore'
 import { calculateMonthlySpend, formatCurrency } from '@/lib/utils'
+import { useAuth } from '@clerk/expo'
 import { styled } from 'nativewind'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context'
-
+import { api } from '@/lib/api'
 
 const SafeAreaView = styled(RNSafeAreaView);
 const mostRecentActivityDate = (sub: Subscription) =>
      Date.parse(sub.startDate ?? sub.startDate ?? '') || 0
-
 const Insights = () => {
      const { subscriptions } = useSubscriptionStore()
      const recentHistory = [...subscriptions]
           .sort((a, b) => mostRecentActivityDate(b) - mostRecentActivityDate(a))
           .slice(0, 3);
+     const { getToken } = useAuth();
+     const [categoryData, setCategoryData] = useState<{ label: string; amount: number }[]>([]);
 
-     const categorySpend = useMemo(() => {
-          const totals: Record<string, number> = {};
-          subscriptions
-               .filter((sub) => sub.status === 'active')
-               .forEach((sub) => {
-                    const monthlyPrice = sub.billing === "Yearly" ? sub.price / 12 : sub.price;
-                    const key = sub.category || "Other";
-                    totals[key] = (totals[key] || 0) + monthlyPrice;
+     useEffect(() => {
+          (async () => {
+               const token = await getToken();
+               if (!token) return;
+               try {
+                    const data = await api.getInsights(token);
+                    const mapped = data.categoryBreakdown.map((item: any) => ({
+                         label: item._id || "Other",
+                         amount: item.total,
+                    }));
+                    setCategoryData(mapped);
 
-               });
-          return Object.entries(totals).map(([label, amount]) => ({
-               label, amount,
-          }));
-     }, [subscriptions]);
+               } catch (err) {
+                    console.log("Failed to fetch insights:", err)
+               }
+          })();
+     }, [])
 
- const monthlySpend = useMemo(
-     ()=> calculateMonthlySpend(subscriptions),[subscriptions]
- );
+     const monthlySpend = useMemo(
+          () => calculateMonthlySpend(subscriptions), [subscriptions]
+     );
+
      return (
           <SafeAreaView className="bg-background flex-1 p-5 ">
                <Text className="mb-5 text-3xl font-sans-bold text-primary">Monthly Insights</Text>
@@ -47,7 +53,7 @@ const Insights = () => {
                     <ListHeading title="Weekly spending" />
 
                     <View style={{ backgroundColor: colors.muted, borderRadius: 14, padding: 16, marginBottom: 16 }}>
-                         <WeeklyBarChart data={categorySpend} />
+                         <WeeklyBarChart data={categoryData} />
                     </View>
 
                     <View style={{ backgroundColor: colors.card, borderRadius: 14, padding: 18, marginBottom: 16, borderWidth: 1, borderColor: colors.border }}>
