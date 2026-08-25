@@ -1,10 +1,11 @@
 import { formatCurrency, resolveIcon } from "@/lib/utils";
+import clsx from "clsx";
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 
-const UpcomingSubscriptionCard = ({name, price, daysLeft, icon, currency}: UpcomingSubscription) => {
+const UpcomingSubscriptionCard = ({name, price, daysLeft, icon, currency, fullWidth}: UpcomingSubscriptionProps) => {
     return (
-        <View className="upcoming-card">
+        <View className="upcoming-card" style={fullWidth?{width:"90%", alignSelf:"center", marginInline:"auto"}: undefined}>
            <View className="upcoming-row">
                <Image source={resolveIcon(icon)} className="upcoming-icon"/>
                <View>

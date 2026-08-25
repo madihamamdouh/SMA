@@ -46,13 +46,17 @@ const SubscriptionCard = ({
                {expanded && (
                     <View className="sub-body">
                          <View className="sub-details">
+                              {
+                                   paymentMethod?.trim() &&(
                               <View className="sub-row">
                                    <View className="sub-row-copy">
                                         <Text className="sub-label"> Payment:</Text>
                                         <Text className="sub-value" ellipsizeMode="tail"
-                                             numberOfLines={1}> {paymentMethod?.trim()}</Text>
+                                             numberOfLines={1}> {paymentMethod}</Text>
                                    </View>
                               </View>
+                                   )
+                              }
 
                               <View className="sub-row">
                                    <View className="sub-row-copy">

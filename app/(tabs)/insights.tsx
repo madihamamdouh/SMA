@@ -17,11 +17,10 @@ const mostRecentActivityDate = (sub: Subscription) =>
      Date.parse(sub.startDate ?? sub.startDate ?? '') || 0
 const Insights = () => {
      const { subscriptions } = useSubscriptionStore()
-     const recentHistory = [...subscriptions]
-          .sort((a, b) => mostRecentActivityDate(b) - mostRecentActivityDate(a))
-          .slice(0, 3);
-     const { getToken } = useAuth();
      const [categoryData, setCategoryData] = useState<{ label: string; amount: number }[]>([]);
+     const [showAllHistory, setShowAllHistory] = useState(false);
+     
+     const { getToken } = useAuth();
 
      useEffect(() => {
           (async () => {
@@ -39,7 +38,15 @@ const Insights = () => {
                     console.log("Failed to fetch insights:", err)
                }
           })();
-     }, [])
+     }, []);
+
+     const recentHistory = useMemo(() => {
+          const sorted = [...subscriptions].sort(
+               (a, b) => mostRecentActivityDate(b) - mostRecentActivityDate(a)
+          );
+          return showAllHistory ? sorted : sorted.slice(0, 3);
+
+     }, [subscriptions, showAllHistory]);
 
      const monthlySpend = useMemo(
           () => calculateMonthlySpend(subscriptions), [subscriptions]
@@ -73,7 +80,7 @@ const Insights = () => {
                          </View>
                     </View>
 
-                    <ListHeading title="History" />
+                    <ListHeading title="History" onViewAll={() => setShowAllHistory((prev)=> !prev)} />
 
                     <View style={{ marginTop: 12 }}>
                          {recentHistory.map((sub) => (

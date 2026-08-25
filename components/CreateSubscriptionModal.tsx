@@ -15,29 +15,25 @@ import {
 } from "react-native";
 
 const CATEGORIES = [
-   'Entertainment' , 'AI Tools' , 'Developer Tools' , 'Design' , 'Productivity' , 'Other'
+   'Entertainment' , 'AI Tools' , 
+   'Developer Tools' , 'Design' , 
+   'Productivity' , 'Other'
 ] as const;
-
 const FREQUENCIES = ["Monthly", "Yearly"] as const;
+const PAYMENT_METHOD = ["Credit Card", "Paypal", "Apple pay", "Bank Transfer"] as const;
+const CATEGORY_COLORS: Record<Category, string> = {
+     'Entertainment': '#EB7D00',
+     'AI Tools': '#b8d4e3',
+     'Developer Tools': '#11bfbf',
+     'Design': '#f5c542',
+     'Productivity': '#95e1d3',
+     'Other': '#a6b9f5',
+};
 
 type Frequency = (typeof FREQUENCIES)[number];
 type Category = (typeof CATEGORIES)[number];
+type PaymentMethod = (typeof PAYMENT_METHOD) [number];
 
-const CATEGORY_COLORS: Record<Category, string> = {
-
-     'Entertainment': '#ff6b6b',
-     'AI Tools': '#b8d4e3',
-     'Developer Tools': '#e8def8',
-     'Design': '#f5c542',
-     'Productivity': '#95e1d3',
-     'Other': '#d4d4d4',
-};
-
-interface CreateSubscriptionModalProps {
-     visible: boolean;
-     onClose: () => void;
-     onSubmit: (subscription: Subscription) => void;
-}
 
 const CreateSubscriptionModal = ({
      visible,
@@ -48,12 +44,13 @@ const CreateSubscriptionModal = ({
      const [price, setPrice] = useState("");
      const [frequency, setFrequency] = useState<Frequency>("Monthly");
      const [category, setCategory] = useState<Category>("Other");
-
+     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("Credit Card");
      const resetForm = () => {
           setName("");
           setPrice("");
           setFrequency("Monthly");
           setCategory("Other");
+          setPaymentMethod("Credit Card")
      };
 
      useEffect(() => {
@@ -88,6 +85,7 @@ const CreateSubscriptionModal = ({
                startDate,
                renewalDate,
                color: CATEGORY_COLORS[category],
+               paymentMethod
           });
 
           posthog.capture("subscription_created", {
@@ -194,6 +192,33 @@ const CreateSubscriptionModal = ({
                                                                       className={clsx(
                                                                            "category-chip-text",
                                                                            isActive && "category-chip-text-active",
+                                                                      )}
+                                                                 >
+                                                                      {option}
+                                                                 </Text>
+                                                            </Pressable>
+                                                       );
+                                                  })}
+                                             </View>
+                                        </View>
+                                        <View className="auth-field">
+                                             <Text className="auth-label">Payment Method </Text>
+                                             <View className="category-scroll">
+                                                  {PAYMENT_METHOD.map((option) => {
+                                                       const isActive = paymentMethod === option;
+                                                       return (
+                                                            <Pressable
+                                                                 key={option}
+                                                                 className={clsx(
+                                                                      "picker-option",
+                                                                      isActive && "picker-option-active",
+                                                                 )}
+                                                                 onPress={() => setPaymentMethod(option)}
+                                                            >
+                                                                 <Text
+                                                                      className={clsx(
+                                                                           "picker-option-text",
+                                                                           isActive && "picker-option-text-active",
                                                                       )}
                                                                  >
                                                                       {option}

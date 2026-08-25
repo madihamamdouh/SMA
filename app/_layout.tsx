@@ -2,11 +2,11 @@ import "@/global.css";
 import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
-import { Slot, SplashScreen, usePathname, useGlobalSearchParams } from "expo-router";
-import { useEffect, useRef } from "react";
+import { Slot, SplashScreen, useGlobalSearchParams, usePathname } from "expo-router";
 import { PostHogProvider } from "posthog-react-native";
+import React, { useEffect, useRef } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { posthog } from "../src/config/posthog";
-
 SplashScreen.preventAutoHideAsync();
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -45,6 +45,8 @@ export default function RootLayout() {
   }, [fontsLoad]);
   if (!fontsLoad) return null;
   return (
+     <GestureHandlerRootView style={{flex:1}}>
+
     <PostHogProvider
       client={posthog}
       autocapture={{
@@ -58,5 +60,6 @@ export default function RootLayout() {
         <Slot />
       </ClerkProvider>
     </PostHogProvider>
+     </GestureHandlerRootView>
   );
 }

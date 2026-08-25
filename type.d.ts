@@ -1,4 +1,4 @@
-import type { ImageSourcePropType } from "react-native";
+
 
 declare global {
     interface AppTab {
@@ -24,8 +24,8 @@ declare global {
         price: number;
         currency?: string;
         billing: string;
-        frequency?: string;
         renewalDate?: string;
+        createdAt?: string;
         color?: string;
     }
 
@@ -36,14 +36,20 @@ declare global {
         isCancelling?: boolean;
     }
 
-    interface UpcomingSubscription {
+    interface UpcomingSubscriptionProps {
         id: string;
-        icon: ImageSourcePropType;
+        icon?: string;
         name: string;
         price: number;
         currency?: string;
         daysLeft: number;
+        fullWidth?:boolean;
     }
+    interface CreateSubscriptionModalProps {
+     visible: boolean;
+     onClose: () => void;
+     onSubmit: (subscription: Subscription) => void;
+}
 
     interface UpcomingSubscriptionCardProps
         extends Omit<UpcomingSubscription, "id"> {}
@@ -51,8 +57,6 @@ declare global {
     interface ListHeadingProps {
         title: string;
     }
-
-
 
     interface WeeklyBarChartProps {
         data: BarChartPoint[];
@@ -64,6 +68,15 @@ declare global {
     interface BarChartPoint{
      label: string;
      amount: number;
+    }
+    interface ListHeadingProps{
+     title: string;
+     onViewAll?: ()=> void;
+    }
+    interface UpcomingModalProps{
+     visible: boolean;
+     onClose:()=> void;
+     subscriptions: Subscription[];
     }
 }
 
