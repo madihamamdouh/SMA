@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://192.168.70.98:4000";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiRequest(
      path: string,
