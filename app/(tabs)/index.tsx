@@ -46,7 +46,7 @@ export default function App() {
      useEffect(() => {
           (async () => {
                const token = await getToken();
-               // console.log("Token:", await getToken())
+
                if (!token) return;
                fetchSubscriptions(token);
           })();
@@ -90,7 +90,7 @@ export default function App() {
                     price: newSubscription.price,
                });
           } catch (err) {
-               console.log("Failed to create subscripton:", err);
+               console.error("Failed to create subscripton:", err);
           }
      };
      const recentHistory = useMemo(() =>

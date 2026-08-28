@@ -5,13 +5,7 @@ const apiKey = Constants.expoConfig?.extra?.posthogProjectToken as string | unde
 const host = Constants.expoConfig?.extra?.posthogHost as string | undefined
 const isPostHogConfigured = !!(apiKey && apiKey !== 'phc_your_project_token_here')
 
-if (__DEV__) {
-  console.log('PostHog config:', {
-    apiKey: apiKey ? 'SET' : 'NOT SET',
-    host: host ? 'SET' : 'NOT SET',
-    isConfigured: isPostHogConfigured,
-  })
-}
+
 
 if (!isPostHogConfigured) {
   console.warn(

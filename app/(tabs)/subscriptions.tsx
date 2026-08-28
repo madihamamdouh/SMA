@@ -50,7 +50,7 @@ const Subscriptions = () => {
           try {
                await updateSubscription(token, item.id, { status: newStatus })
           } catch (err) {
-               console.log("Failed to update Subscription:", err);
+               console.error("Failed to update Subscription:", err);
           }
           finally {
                setCancellingId(null);

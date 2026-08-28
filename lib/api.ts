@@ -15,7 +15,6 @@ export async function apiRequest(
           },
      });
      if (!res.ok) {
-            console.log("Request failed:", res.status, path); 
           const error = await res.json().catch(() => ({ error: "Request Failed" }));
           throw new Error(error.error || "Request Failed");
      }

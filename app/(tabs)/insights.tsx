@@ -35,7 +35,7 @@ const Insights = () => {
                     setCategoryData(mapped);
 
                } catch (err) {
-                    console.log("Failed to fetch insights:", err)
+                    console.error("Failed to fetch insights:", err)
                }
           })();
      }, []);
