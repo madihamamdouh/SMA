@@ -1,6 +1,6 @@
 import { createAuthNavigate } from "@/lib/authNavigate";
 import { useAuth, useSignUp } from "@clerk/expo";
-import { type Href, Link, useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
 import React, { useState } from "react";
@@ -24,22 +24,29 @@ export default function SignUp() {
      const posthog = usePostHog();
 
      const [emailAddress, setEmailAddress] = useState("");
+     const [name, setName] = useState("");
      const [password, setPassword] = useState("");
      const [code, setCode] = useState("");
 
      // Validation states
      const [emailTouched, setEmailTouched] = useState(false);
      const [passwordTouched, setPasswordTouched] = useState(false);
+     const [nameTouched, setNameTouched] = useState(false);
      const [formError, setFormError] = useState<string | null>(null);
      // Client-side validation
      const emailValid =
           emailAddress.length === 0 ||
           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
+     const nameValid = name.trim().length > 0;
      const passwordValid = password.length === 0 || password.length >= 8;
      const formValid =
-          emailAddress.length > 0 && password.length >= 8 && emailValid;
+          emailAddress.length > 0 &&
+          name.trim().length > 0 &&
+          password.length >= 8 &&
+          emailValid;
+
      const handelNavigate = createAuthNavigate(setFormError);
-     
+
      const handleSubmit = async () => {
           setFormError(null);
           if (!formValid) return;
@@ -47,6 +54,8 @@ export default function SignUp() {
           const { error } = await signUp.password({
                emailAddress,
                password,
+               firstName: name.trim(),
+
           });
           if (error) {
                console.error(JSON.stringify(error, null, 2));
@@ -57,14 +66,14 @@ export default function SignUp() {
      };
 
      const handleVerify = async () => {
-          await signUp.verifications.verifyEmailCode({code, });
+          await signUp.verifications.verifyEmailCode({ code, });
           if (signUp.status === "complete") {
                posthog.identify(emailAddress, {
                     email: emailAddress,
                     $set_once: { signup_date: new Date().toISOString() },
                });
                posthog.capture('user_signed_up', { method: 'email_password' });
-               await signUp.finalize({ navigate:handelNavigate });
+               await signUp.finalize({ navigate: handelNavigate });
           } else {
                console.error("Sign-up attempt not complete:", signUp);
           }
@@ -74,6 +83,7 @@ export default function SignUp() {
           try {
                await signUp.reset();
                router.replace("/sign-up");
+               setName("");
                setEmailAddress("");
                setPassword("");
                setCode("");
@@ -155,7 +165,7 @@ export default function SignUp() {
                                                             : "Verify Email"}
                                                   </Text>
                                              </Pressable>
-                                                    {formError && <Text className="auth-error">{formError}</Text>}
+                                             {formError && <Text className="auth-error">{formError}</Text>}
 
                                              <Pressable
                                                   className="auth-secondary-button"
@@ -222,6 +232,28 @@ export default function SignUp() {
                               <View className="auth-card">
                                    <View className="auth-form">
                                         <View className="auth-field">
+                                             <Text className="auth-label">Name</Text>
+                                             <TextInput
+                                                  className={`auth-input ${nameTouched && !nameValid && "auth-input-error"}`}
+                                                  value={name}
+                                                  placeholder="Your Name"
+                                                  placeholderTextColor="rgba(0, 0, 0, 0.4)"
+                                                  onChangeText={setName}
+                                                  onBlur={() => setNameTouched(true)}
+                                                  autoCapitalize="words"
+                                             />
+                                             {nameTouched && !nameValid && (
+                                                  <Text className="auth-error">
+                                                       Please enter a valid Name
+                                                  </Text>
+                                             )}
+                                             {errors.fields.firstName && (
+                                                  <Text className="auth-error">
+                                                       {errors.fields.firstName.message}
+                                                  </Text>
+                                             )}
+                                        </View>
+                                        <View className="auth-field">
                                              <Text className="auth-label">Email Address</Text>
                                              <TextInput
                                                   className={`auth-input ${emailTouched && !emailValid && "auth-input-error"}`}
@@ -236,7 +268,7 @@ export default function SignUp() {
                                              />
                                              {emailTouched && !emailValid && (
                                                   <Text className="auth-error">
-                                                       Please enter a valid email address
+                                                       Please enter a valid Email Address
                                                   </Text>
                                              )}
                                              {errors.fields.emailAddress && (

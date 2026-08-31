@@ -80,7 +80,7 @@ const Settings = () => {
       </View>
 
       <Pressable className="auth-button bg-destructive" onPress={handleSignOut}>
-        <Text className="auth-button-text text-white">Sign Out</Text>
+        <Text className="auth-button-text">Sign Out</Text>
       </Pressable>
     </SafeAreaView>
   );

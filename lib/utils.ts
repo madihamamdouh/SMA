@@ -8,6 +8,22 @@ export const resolveIcon = (key?: string) => {
      }
      return icons.wallet;
 }
+export const CATEGORY_COLORS: Record<string, string> = {
+     'Entertainment': '#5b8def',
+     'AI Tools': '#2fb392',
+     'Developer Tools': '#a78bda',
+     'Design': '#e8b04b',
+     'Productivity': '#e6685d',
+     'Other': '#9aa5c0',
+};
+
+export const resolveColor = (category?: string) => {
+     if (category && category in CATEGORY_COLORS) {
+
+          return CATEGORY_COLORS[category];
+     }
+     return CATEGORY_COLORS["Other"];
+}
 
 export const guessIconKey = (name: string): string => {
      const normalized = name.toLowerCase();

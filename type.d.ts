@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from "react-native";
 
 
 declare global {
@@ -9,7 +10,7 @@ declare global {
 
     interface TabIconProps {
         focused: boolean;
-        icon: string;
+        icon: ImageSourcePropType;
     }
 
     interface Subscription {

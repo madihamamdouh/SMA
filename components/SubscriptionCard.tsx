@@ -1,4 +1,4 @@
-import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime, resolveIcon } from "@/lib/utils";
+import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime, resolveColor, resolveIcon } from "@/lib/utils";
 import clsx from "clsx";
 import React from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
@@ -12,7 +12,6 @@ const SubscriptionCard = ({
      category, plan, renewalDate,
      onPress,
      expanded,
-     color,
      paymentMethod,
      startDate,
      status,
@@ -23,7 +22,7 @@ const SubscriptionCard = ({
      const isCancelled = status === 'cancelled';
      return (
           <Pressable onPress={onPress} className={clsx('sub-card', expanded ? 'sub-card-expanded' : 'bg-card')}
-               style={!expanded && color ? { backgroundColor: color } : undefined}>
+               style={!expanded  ? { backgroundColor: resolveColor(category) } : undefined}>
                <View className="sub-head">
                     <View className="sub-main">
                          <Image source={resolveIcon(icon)} className="sub-icon" />

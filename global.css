@@ -5,19 +5,19 @@
 @import "nativewind/theme";
 
 @theme {
-  --color-background: #fff9e3;
-  --color-foreground: #081126;
-  --color-card: #fff8e7;
-  --color-muted: #f6eecf;
-  --color-muted-foreground: rgba(0, 0, 0, 0.6);
+  --color-background: #f4f6fb;
+  --color-foreground: #1a2138;
+  --color-card: #ffffff;
+  --color-muted: #e8ecf7;
+  --color-muted-foreground: #2f3033;
   --color-muted-foreground-2: rgba(0, 0, 0, 0.1);
-  --color-primary: #081126;
-  --color-accent: #ea7a53;
-  --color-accent-light: rgb(234, 122, 83,0.8);
+  --color-primary: #1a2138;
+  --color-accent: #3b4a9c;
+  --color-accent-light: rgba(59, 74, 156, 0.8);
   --color-border: rgba(0, 0, 0, 0.1);
   --color-success: #16a34a;
   --color-destructive: #dc2626;
-  --color-subscription: #8fd1bd;
+  --color-subscription: #2fb392;
 
   --font-sans: sans-regular;
   --font-sans-light: sans-light;
@@ -320,7 +320,7 @@
   }
 
   .auth-button-text {
-    @apply text-base font-sans-bold text-primary;
+    @apply text-base font-sans-bold text-background;
   }
 
   .auth-secondary-button {

@@ -11,6 +11,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context'
 import { api } from '@/lib/api'
+import dayjs from 'dayjs'
 
 const SafeAreaView = styled(RNSafeAreaView);
 const mostRecentActivityDate = (sub: Subscription) =>
@@ -72,10 +73,7 @@ const Insights = () => {
                          </View>
                          <View className="flex-row justify-between items-center mt-6">
                               <Text className="text-sm font-sans-medium text-muted-foreground">
-                                   March 2026
-                              </Text>
-                              <Text className="text-sm font-sans-medium text-muted-foreground">
-                                   +12%
+                                  {dayjs().format("MMM YYYY")}
                               </Text>
                          </View>
                     </View>

@@ -38,13 +38,11 @@ export default function App() {
      const [isUpcomingModalVisible, setIsUpcomingVisible] = useState(false);
      const { subscriptions, isLoading, error, addSubscription, fetchSubscriptions } = useSubscriptionStore();
      const dispalyName =
-          user?.firstName ||
-          user?.fullName ||
-          user?.emailAddresses[0]?.emailAddress ||
-          "User";
+          user?.firstName || "User";
 
      useEffect(() => {
           (async () => {
+                console.log("tokemn:", await getToken());
                const token = await getToken();
 
                if (!token) return;
@@ -80,6 +78,7 @@ export default function App() {
 
      const handleCreateSubscription = async (newSubscription: Subscription) => {
           const token = await getToken();
+         
           if (!token) return;
           try {
                await addSubscription(token, newSubscription);

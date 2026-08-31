@@ -1,5 +1,4 @@
 import { formatCurrency, resolveIcon } from "@/lib/utils";
-import clsx from "clsx";
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 

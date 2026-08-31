@@ -1,4 +1,4 @@
-import { guessIconKey } from "@/lib/utils";
+import { guessIconKey , CATEGORY_COLORS} from "@/lib/utils";
 import { posthog } from "@/src/config/posthog";
 import clsx from "clsx";
 import dayjs from "dayjs";
@@ -21,19 +21,10 @@ const CATEGORIES = [
 ] as const;
 const FREQUENCIES = ["Monthly", "Yearly"] as const;
 const PAYMENT_METHOD = ["Credit Card", "Paypal", "Apple pay", "Bank Transfer"] as const;
-const CATEGORY_COLORS: Record<Category, string> = {
-     'Entertainment': '#EB7D00',
-     'AI Tools': '#b8d4e3',
-     'Developer Tools': '#11bfbf',
-     'Design': '#f5c542',
-     'Productivity': '#95e1d3',
-     'Other': '#a6b9f5',
-};
 
 type Frequency = (typeof FREQUENCIES)[number];
 type Category = (typeof CATEGORIES)[number];
 type PaymentMethod = (typeof PAYMENT_METHOD) [number];
-
 
 const CreateSubscriptionModal = ({
      visible,
@@ -84,7 +75,6 @@ const CreateSubscriptionModal = ({
                status: "active",
                startDate,
                renewalDate,
-               color: CATEGORY_COLORS[category],
                paymentMethod
           });
 
