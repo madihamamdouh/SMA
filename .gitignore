@@ -50,6 +50,7 @@ app-example
 # Agents
 .claude/
 .agents/
+**junie/
 **CLAUDE.md/
 **AGENTS.md/
 
