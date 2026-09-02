@@ -1,11 +1,10 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export async function apiRequest(
      path: string,
      token: string,
      options: RequestInit = {}
 ) {
-     const res = await fetch(`${API_BASE_URL}${path}`, {
+     const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${path}`, {
           ...options,
           headers: {
                "Content-Type": "application/json",

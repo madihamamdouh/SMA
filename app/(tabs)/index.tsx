@@ -5,7 +5,6 @@ import SubscriptionCard from "@/components/SubscriptionCard";
 import UpcomingSubscriptionCard from "@/components/UpcomingSubscriptionCard";
 import dayjs from "dayjs";
 import images from "@/constants/images";
-import { HOME_USER } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { useSubscriptionStore } from "@/lib/subscriptionStore";
 import { calculateMonthlySpend, formatCurrency, getNextRenewalDate } from "@/lib/utils";
@@ -37,14 +36,11 @@ export default function App() {
      const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
      const [isUpcomingModalVisible, setIsUpcomingVisible] = useState(false);
      const { subscriptions, isLoading, error, addSubscription, fetchSubscriptions } = useSubscriptionStore();
-     const dispalyName =
-          user?.firstName || "User";
+     const dispalyName = user?.firstName || "User";
 
      useEffect(() => {
           (async () => {
-                console.log("tokemn:", await getToken());
                const token = await getToken();
-
                if (!token) return;
                fetchSubscriptions(token);
           })();
@@ -78,7 +74,7 @@ export default function App() {
 
      const handleCreateSubscription = async (newSubscription: Subscription) => {
           const token = await getToken();
-         
+
           if (!token) return;
           try {
                await addSubscription(token, newSubscription);
@@ -117,7 +113,7 @@ export default function App() {
                          />
                          <Text className="home-user-name">
                               {" "}
-                              {dispalyName || HOME_USER.name}
+                              {dispalyName}
                          </Text>
                     </View>
                     <Pressable onPress={() => setIsCreateModalVisible(true)}>

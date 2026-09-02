@@ -58,7 +58,7 @@ const Insights = () => {
                <Text className="mb-5 text-3xl font-sans-bold text-primary">Monthly Insights</Text>
 
                <ScrollView showsVerticalScrollIndicator={false} className='mb-10'>
-                    <ListHeading title="Weekly spending" />
+                    <ListHeading title="Spending By Category" />
 
                     <View style={{ backgroundColor: colors.muted, borderRadius: 14, padding: 16, marginBottom: 16 }}>
                          <WeeklyBarChart data={categoryData} />
@@ -75,6 +75,7 @@ const Insights = () => {
                               <Text className="text-sm font-sans-medium text-muted-foreground">
                                   {dayjs().format("MMM YYYY")}
                               </Text>
+
                          </View>
                     </View>
 

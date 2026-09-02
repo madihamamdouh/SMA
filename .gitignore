@@ -46,4 +46,8 @@ app-example
 .env
 .env
 .idea/ 
- .claude/
+.claude/
+CLAUDE.md/
+.AGENTS.md/
+
+.claude/
