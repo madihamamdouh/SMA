@@ -3,8 +3,10 @@
 # dependencies
 node_modules/
 
+
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
@@ -31,25 +33,26 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+.env.*
 .env*.local
+
 
 # typescript
 *.tsbuildinfo
-
+.jks
 app-example
 
 # generated native folders
 /ios
 /android
-.env
-.jks
-.env
-.env
-.idea/ 
-.claude/
-CLAUDE.md/
-.AGENTS.md/
-.claude/
 
-**/.CLAUDE.md
-**/AGENTS.md
+# Agents
+.claude/
+.agents/
+**CLAUDE.md/
+**AGENTS.md/
+
+# IDE
+.vscode/
+.idea/ 
