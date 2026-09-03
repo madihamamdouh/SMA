@@ -79,6 +79,11 @@ declare global {
      onClose:()=> void;
      subscriptions: Subscription[];
     }
+   export interface ReminderPref{
+     denabled: boolean;
+     leadDays: number[];
+    }
+  
 }
 
 export { };

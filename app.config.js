@@ -72,6 +72,15 @@ module.exports = {
         },
       ],
       ["expo-localization"],
+      [
+        "expo-notifications",
+        {
+          icon: "./local/assets/notification_icon.png",
+          color: "#ffffff",
+          defaultChannel: "default",
+          enableBackgroundRemoteNotifications: false,
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,
