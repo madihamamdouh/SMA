@@ -10,7 +10,7 @@ import { formatCurrency } from "./utils";
 const CHANNEL_ID = "renewals";
 const PREFS_KEY = "reminderPrefs";
 const REMINDER_HOUR = 9;
-const MAX_SCHEDULED=60;
+const MAX_SCHEDULED = 60;
 export const DEFAULT_REMINDER_PREFS: ReminderPref = {
      enabled: true,
      leadDays: [1, 3, 7],
@@ -23,6 +23,19 @@ Notifications.setNotificationHandler({
           shouldSetBadge: false,
      }),
 });
+
+// Android channels are created once and persist at OS level. Doing it at
+// module load removes the hidden dependency on ensureNotificationPermission
+// having run first — syncRenewalReminder can schedule on any app open.
+
+if (Platform.OS === "android") {
+     Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+          name: "Renewals reminders",
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#3b4a9c",
+     });
+}
 
 export const getReminderPrefs = async (): Promise<ReminderPref> => {
      try {
@@ -40,14 +53,6 @@ export const setReminderPrefs = async (prefs: ReminderPref) => {
 }
 export const ensureNotificationPermission = async (): Promise<boolean> => {
      if (!Device.isDevice) return false; //for emulator or semulator no op
-     if (Platform.OS === "android") {
-          await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-               name: "Renewals Reminder",
-               importance: Notifications.AndroidImportance.HIGH,
-               vibrationPattern: [0, 250, 250, 250],
-               lightColor: "#FF231F7C",
-          });
-     }
      const { status: existing } = await Notifications.getPermissionsAsync();
      if (existing === "granted") return true;
      const { status } = await Notifications.requestPermissionsAsync();
@@ -86,11 +91,11 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
 
      const now = dayjs();
      //pass 1: work out everything we would schedule.
-     const planned:{
-          fireAt:dayjs.Dayjs;
+     const planned: {
+          fireAt: dayjs.Dayjs;
           sub: Subscription;
-          daysBefore:number;
-     } []= [];
+          daysBefore: number;
+     }[] = [];
      for (const sub of subscriptions) {
           if (sub.status !== "active" || !sub.renewalDate) continue;
 
@@ -99,27 +104,27 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
 
                //skip anything already in the past, or it fires immedtialy.
                if (!fireAt.isAfter(now)) continue;
-               planned.push({fireAt,sub,daysBefore})
+               planned.push({ fireAt, sub, daysBefore })
 
           }
      }
      // Pass 2: soonest first, then keep only what iOS will honour. Anything
      // dropped is the most distant, and re-syncs on the next app open long
      // before it comes due.
-     planned.sort((a,b)=>a.fireAt.diff(b.fireAt));
-     
-     for(const {fireAt, sub, daysBefore} of planned.slice(0, MAX_SCHEDULED)){
+     planned.sort((a, b) => a.fireAt.diff(b.fireAt));
+
+     for (const { fireAt, sub, daysBefore } of planned.slice(0, MAX_SCHEDULED)) {
           await Notifications.scheduleNotificationAsync({
-               content:{
+               content: {
                     ...buildContent(sub, daysBefore),
-                    data: {subscriptionId:sub.id},
-                    ...(Platform.OS === "android" && {channelId: CHANNEL_ID} ),
+                    data: { subscriptionId: sub.id },
+                    ...(Platform.OS === "android" && { channelId: CHANNEL_ID }),
 
                },
-               trigger:{
-                    type:Notifications.SchedulableTriggerInputTypes.DATE,
-                    date:fireAt.toDate(),
-                    ...(Platform.OS === "android" && {channelId: CHANNEL_ID} ),
+               trigger: {
+                    type: Notifications.SchedulableTriggerInputTypes.DATE,
+                    date: fireAt.toDate(),
+                    ...(Platform.OS === "android" && { channelId: CHANNEL_ID }),
 
                },
           });
@@ -127,29 +132,33 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
 
 };
 
-export const debugScheduled = async ()=>{
+export const debugScheduled = async () => {
      const all = await Notifications.getAllScheduledNotificationsAsync();
-     console.log("Schedualed:", 
-          all.map((n)=> ({title: n.content.title, trigger: n.trigger})),
+     console.log("Schedualed:",
+          all.map((n) => ({ title: n.content.title, trigger: n.trigger })),
      );
 };
+export const getScheduledCount = async (): Promise<number> => {
+     const all = await Notifications.getAllScheduledNotificationsAsync();
+     return all.length;
+}
 
-export const sendTestNotification = async ()=>{
-   const granted= await ensureNotificationPermission();
-   if(!granted){
-     console.warn("Notification not permitted");
-     return
-   };
+export const sendTestNotification = async () => {
+     const granted = await ensureNotificationPermission();
+     if (!granted) {
+          console.warn("Notification not permitted");
+          return
+     };
      await Notifications.scheduleNotificationAsync({
-          content:{
-               title:"SMA aeminder are on",
-               body:"This is what a renewal reminders looks like",
-               ...(Platform.OS === 'android' && {channelId:CHANNEL_ID})
+          content: {
+               title: "SMA notifications are working",
+               body: "This is what a renewal reminder looks like",
+               ...(Platform.OS === 'android' && { channelId: CHANNEL_ID })
           },
-          trigger:{
+          trigger: {
                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-               seconds:10,
-               ...(Platform.OS ==="android" && {channelId:CHANNEL_ID})
+               seconds: 10,
+               ...(Platform.OS === "android" && { channelId: CHANNEL_ID })
 
           },
      });

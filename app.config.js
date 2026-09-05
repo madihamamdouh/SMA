@@ -77,7 +77,6 @@ module.exports = {
         {
           icon: "./assets/images/notification-icon.png",
           color: "#3b4a9c",
-          defaultChannel: "default",
           enableBackgroundRemoteNotifications: false,
         },
       ],

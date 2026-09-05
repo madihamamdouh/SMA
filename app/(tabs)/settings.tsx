@@ -3,9 +3,10 @@ import {
      DEFAULT_REMINDER_PREFS,
      ensureNotificationPermission,
      getReminderPrefs,
+     getScheduledCount,
      sendTestNotification,
      setReminderPrefs,
-     syncRenewalReminder,
+     syncRenewalReminder
 } from "@/lib/notifications";
 import { useSubscriptionStore } from "@/lib/subscriptionStore";
 import { useClerk, useUser } from "@clerk/expo";
@@ -24,7 +25,11 @@ const Settings = () => {
      const posthog = usePostHog();
      const [prefs, setPrefs] = useState<ReminderPref>(DEFAULT_REMINDER_PREFS);
      const subscriptions = useSubscriptionStore((s) => s.subscriptions);
+     const [scheduledCount, setScheduledCount] = useState(0);
 
+     const refreshCount = async()=>{
+          setScheduledCount(await getScheduledCount());
+     }
      const handleSignOut = async () => {
           posthog.capture('user_signed_out');
           await signOut();
@@ -36,8 +41,10 @@ const Settings = () => {
           user?.emailAddresses[0]?.emailAddress ||
           "User";
      const email = user?.emailAddresses[0]?.emailAddress || "No email";
+
      useEffect(() => {
           getReminderPrefs().then(setPrefs).catch(console.error);
+          refreshCount();
      }, []);
      
      const applyPrefs = async (next: ReminderPref) => {
@@ -50,6 +57,7 @@ const Settings = () => {
           setPrefs(next);
           await setReminderPrefs(next);
           await syncRenewalReminder(subscriptions);
+          await refreshCount();
           posthog.capture("reminder_prefs_changed", {
                enabled: next.enabled,
                lead_days: next.leadDays,
@@ -128,6 +136,14 @@ const Settings = () => {
                                         );
                                    })}
                               </View>
+                              <Text className="text-s font-medium text-muted-foreground mt-3">
+                                   {
+                                        scheduledCount === 0
+                                        ? "No Reminders scheduled"
+                                        :`${scheduledCount} reminder${scheduledCount === 1? "": "s"} scheduled`
+                                   }
+
+                              </Text>
 
                               <Pressable className="mt-4" onPress={sendTestNotification}>
                                    <Text className="text-primary font-sans-bold text-sm">

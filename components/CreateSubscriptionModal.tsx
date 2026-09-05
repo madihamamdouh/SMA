@@ -1,4 +1,4 @@
-import { guessIconKey , CATEGORY_COLORS} from "@/lib/utils";
+import { guessIconKey } from "@/lib/utils";
 import { posthog } from "@/src/config/posthog";
 import clsx from "clsx";
 import dayjs from "dayjs";
