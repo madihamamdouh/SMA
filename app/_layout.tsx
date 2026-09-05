@@ -2,7 +2,8 @@ import "@/global.css";
 import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
-import { Slot, SplashScreen, useGlobalSearchParams, usePathname } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { router, Slot, SplashScreen, useGlobalSearchParams, usePathname } from "expo-router";
 import { PostHogProvider } from "posthog-react-native";
 import React, { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -43,6 +44,15 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoad]);
+  useEffect(() => {
+     const subscription = 
+     Notifications.addNotificationResponseReceivedListener((response)=>{
+          const id = response.notification.request.content.data?.subscriptionId;
+          if(id)(router.push(`/subscriptions/${id}`));
+     });
+     return ()=> subscription.remove();
+  },[])
+
   if (!fontsLoad) return null;
   return (
      <GestureHandlerRootView style={{flex:1}}>

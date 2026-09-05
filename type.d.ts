@@ -80,7 +80,7 @@ declare global {
      subscriptions: Subscription[];
     }
    export interface ReminderPref{
-     denabled: boolean;
+     enabled: boolean;
      leadDays: number[];
     }
   

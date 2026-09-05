@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from './api';
-
+import {syncRenewalReminder} from './notifications';
 interface SubscriptionStore {
      subscriptions: Subscription[];
      isLoading: boolean;
@@ -12,7 +12,7 @@ interface SubscriptionStore {
      deleteSubscription: (token: string, id: string) => Promise<void>;
 }
 
-export const useSubscriptionStore = create<SubscriptionStore>((set) => ({
+export const useSubscriptionStore = create<SubscriptionStore>((set, get) => ({
      subscriptions: [],
      isLoading: false,
      error: null,
@@ -22,6 +22,7 @@ export const useSubscriptionStore = create<SubscriptionStore>((set) => ({
           try {
                const data = await api.getSubscriptions(token);
                set({ subscriptions: data, isLoading: false })
+               syncRenewalReminder(data).catch(console.warn); // Sync notifications after fetching subscriptions
           } catch (err) {
                set({ error: (err as Error).message, isLoading: false });
           }
@@ -29,6 +30,7 @@ export const useSubscriptionStore = create<SubscriptionStore>((set) => ({
      addSubscription: async (token, subscription) => {
           const created = await api.createSubscription(token, subscription);
           set((state) => ({ subscriptions: [created, ...state.subscriptions] }));
+          syncRenewalReminder(get().subscriptions).catch(console.warn); // Sync notifications after adding a subscription
      },
      setSubscriptions: (subscriptions) => set({ subscriptions }),
 
@@ -39,13 +41,14 @@ export const useSubscriptionStore = create<SubscriptionStore>((set) => ({
                     sub.id === id ? updated : sub
                ),
           }));
+          syncRenewalReminder(get().subscriptions).catch(console.warn); // Sync notifications after updating a subscription
      },
      deleteSubscription: async (token, id) => {
           await api.deleteSubscription(token, id);
           set((state) => ({
                subscriptions: state.subscriptions.filter((sub) => sub.id !== id),
 
-
           }));
+          syncRenewalReminder(get().subscriptions).catch(console.warn); // Sync notifications after deleting a subscription
      },
 }));

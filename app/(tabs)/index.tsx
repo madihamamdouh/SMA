@@ -23,6 +23,7 @@ import {
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import UpcomingModal from "@/components/UpcomingModal";
+import { ensureNotificationPermission, syncRenewalReminder } from "@/lib/notifications";
 
 const SafeAreaView = styled(RNSafeAreaView);
 export default function App() {
@@ -76,8 +77,19 @@ export default function App() {
           const token = await getToken();
 
           if (!token) return;
+          // Check if this is the first subscription being added
+          const isFireSubscription = subscriptions.length === 0;
           try {
                await addSubscription(token, newSubscription);
+               if (isFireSubscription) {
+                    const granted = await ensureNotificationPermission();
+                    posthog.capture("notification_permission_result", { granted });
+                    if (granted) {
+                         await syncRenewalReminder(
+                              useSubscriptionStore.getState().subscriptions,
+                         );
+                    }
+               }
                posthog.capture("subscription_created", {
                     subscription_id: newSubscription.id,
                     subscription_name: newSubscription.name,
