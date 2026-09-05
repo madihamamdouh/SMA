@@ -61,7 +61,7 @@ export const formatCurrency = (
 export const formatSubscriptionDateTime = (value?: string): string => {
      if (!value) return "Not Provided";
      const parseDate = dayjs(value);
-     return parseDate.isValid() ? parseDate.format("MM-DD-YYYY") : "Not Provided";
+     return parseDate.isValid() ? parseDate.format("D MMM YYYY") : "Not Provided";
 };
 
 export const formatStatusLabel = (value?: string): string => {

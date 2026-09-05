@@ -30,6 +30,10 @@ export const api = {
           const data = await apiRequest("/subscriptions", token);
           return data.map(normalizeSubscription);
      },
+     getSubscriptionById: async (token: string, id: string)=>{
+          const doc = await apiRequest(`/subscriptions/${id}`, token);
+          return normalizeSubscription(doc);
+     },
 
      createSubscription: async (token: string, data: Partial<Subscription>) =>{
 

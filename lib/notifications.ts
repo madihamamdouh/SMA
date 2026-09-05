@@ -34,7 +34,7 @@ if (Platform.OS === "android") {
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: "#3b4a9c",
-     });
+     }).catch((e) => console.warn("Failed to create a notification channel:", e));
 }
 
 export const getReminderPrefs = async (): Promise<ReminderPref> => {
@@ -73,16 +73,22 @@ const buildContent = (sub: Subscription, daysBefore: number) => {
      const amount = formatCurrency(sub.price, sub.currency);
      return {
           title: `${sub.name} renews ${when}`,
-          body: `${amount} on ${dayjs(sub.renewalDate).format("MMM D",)}. Cancel now if you don't want it.`,
+          body: `${amount} on ${dayjs(sub.renewalDate).format("MMM D")}. Cancel now if you don't want it.`,
      };
 };
 
 
-export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
+const runSync = async (subscriptions: Subscription[]) => {
      const prefs = await getReminderPrefs();
 
-     //always cancel all existing notifications and reschedule based on current subscriptions and preferences
-     await Notifications.cancelAllScheduledNotificationsAsync();
+     // Cancel our reminders and rebuild from scratch — but leave a pending
+     // test notification alone, it isn't ours to clear.    
+     const existing = await Notifications.getAllScheduledNotificationsAsync();
+     await Promise.all(
+          existing
+               .filter((n) => !n.content.data?.test)
+               .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+     )
 
      if (!prefs.enabled) return;
 
@@ -98,6 +104,7 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
      }[] = [];
      for (const sub of subscriptions) {
           if (sub.status !== "active" || !sub.renewalDate) continue;
+          const before = planned.length;
 
           for (const daysBefore of prefs.leadDays) {
                const fireAt = buildFireDate(sub.renewalDate, daysBefore);
@@ -106,6 +113,14 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
                if (!fireAt.isAfter(now)) continue;
                planned.push({ fireAt, sub, daysBefore })
 
+          }
+          if (planned.length === before && dayjs(sub.renewalDate).isAfter(now)) {
+               const daysLeft = Math.max(1, dayjs(sub.renewalDate).diff(now, "day"));
+               planned.push({
+                    fireAt: now.add(2, "minute"),
+                    sub,
+                    daysBefore: daysLeft,
+               })
           }
      }
      // Pass 2: soonest first, then keep only what iOS will honour. Anything
@@ -131,28 +146,39 @@ export const syncRenewalReminder = async (subscriptions: Subscription[]) => {
      };
 
 };
+let syncQueue: Promise<void> = Promise.resolve();
+
+// Every caller shares one queue, so two syncs can never interleave —
+// otherwise one run's cancel pass can wipe another run's partial work.
+export const syncRenewalReminder = (subscriptions: Subscription[]): Promise<void> => {
+     syncQueue = syncQueue
+          .then(() => runSync(subscriptions))
+          .catch((e) => console.warn("Reminder sync failed:", e));
+     return syncQueue;
+}
 
 export const debugScheduled = async () => {
      const all = await Notifications.getAllScheduledNotificationsAsync();
-     console.log("Schedualed:",
+     console.log("Scheduled:",
           all.map((n) => ({ title: n.content.title, trigger: n.trigger })),
      );
 };
 export const getScheduledCount = async (): Promise<number> => {
      const all = await Notifications.getAllScheduledNotificationsAsync();
-     return all.length;
+     return all.filter((n) => !n.content.data?.test).length;
 }
 
 export const sendTestNotification = async () => {
      const granted = await ensureNotificationPermission();
      if (!granted) {
           console.warn("Notification not permitted");
-          return
+          return;
      };
      await Notifications.scheduleNotificationAsync({
           content: {
                title: "SMA notifications are working",
                body: "This is what a renewal reminder looks like",
+               data: { test: true },
                ...(Platform.OS === 'android' && { channelId: CHANNEL_ID })
           },
           trigger: {
