@@ -20,7 +20,7 @@ const WeeklyBarChart = ({ data }: WeeklyBarChartProps) => {
           );
      }
      const maxAmount = Math.max(...data.map((d) => d.amount))
-     const yMax = Math.ceil(maxAmount / 10) * 10
+     const yMax = Math.max(10, Math.ceil(maxAmount / 10) * 10) 
      const yTicks = [0, yMax / 2, yMax]
      const peakIndex = data.reduce((best, d, i) => (d.amount > data[best].amount ? i : best), 0)
 

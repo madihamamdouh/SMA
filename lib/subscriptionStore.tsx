@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from './api';
-import {syncRenewalReminder} from './notifications';
+import { syncRenewalReminder } from './notifications';
 interface SubscriptionStore {
      subscriptions: Subscription[];
      isLoading: boolean;
@@ -10,6 +10,7 @@ interface SubscriptionStore {
      setSubscriptions: (subscriptions: Subscription[]) => void;
      updateSubscription: (token: string, id: string, data: Partial<Subscription>) => Promise<void>;
      deleteSubscription: (token: string, id: string) => Promise<void>;
+     reset: ()=> void;
 }
 
 export const useSubscriptionStore = create<SubscriptionStore>((set, get) => ({
@@ -51,4 +52,5 @@ export const useSubscriptionStore = create<SubscriptionStore>((set, get) => ({
           }));
           syncRenewalReminder(get().subscriptions).catch(console.warn); // Sync notifications after deleting a subscription
      },
+     reset: ()=> set({subscriptions:[], isLoading:false, error:null}),
 }));

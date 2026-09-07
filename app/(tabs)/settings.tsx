@@ -26,14 +26,9 @@ const Settings = () => {
      const [prefs, setPrefs] = useState<ReminderPref>(DEFAULT_REMINDER_PREFS);
      const subscriptions = useSubscriptionStore((s) => s.subscriptions);
      const [scheduledCount, setScheduledCount] = useState(0);
-
+     const resetSubscriptions = useSubscriptionStore((e)=> e.reset);
      const refreshCount = async()=>{
           setScheduledCount(await getScheduledCount());
-     }
-     const handleSignOut = async () => {
-          posthog.capture('user_signed_out');
-          await signOut();
-          posthog.reset();
      };
      const dispalyName =
           user?.firstName ||
@@ -41,6 +36,14 @@ const Settings = () => {
           user?.emailAddresses[0]?.emailAddress ||
           "User";
      const email = user?.emailAddresses[0]?.emailAddress || "No email";
+
+     const handleSignOut = async () => {
+          posthog.capture('user_signed_out');
+          await syncRenewalReminder([]);
+          resetSubscriptions();
+          await signOut();
+          posthog.reset();
+     };
 
      useEffect(() => {
           getReminderPrefs().then(setPrefs).catch(console.error);
@@ -74,6 +77,7 @@ const Settings = () => {
                : [...prefs.leadDays, day].sort((a, b) => b - a);
           applyPrefs({ ...prefs, leadDays });
      };
+     
      return (
           <SafeAreaView className="flex-1 bg-background p-5">
                <Text className="text-3xl font-sans-bold text-primary mb-6">

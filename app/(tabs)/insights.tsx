@@ -15,7 +15,7 @@ import dayjs from 'dayjs'
 
 const SafeAreaView = styled(RNSafeAreaView);
 const mostRecentActivityDate = (sub: Subscription) =>
-     Date.parse(sub.startDate ?? sub.startDate ?? '') || 0
+     Date.parse(sub.createdAt ?? sub.startDate ?? '') || 0
 const Insights = () => {
      const { subscriptions } = useSubscriptionStore()
      const [categoryData, setCategoryData] = useState<{ label: string; amount: number }[]>([]);

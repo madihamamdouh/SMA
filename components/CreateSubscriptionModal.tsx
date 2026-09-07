@@ -99,7 +99,7 @@ const CreateSubscriptionModal = ({
                          behavior={Platform.OS === "ios" ? "padding" : "height"}
                          className="flex-1 justify-end"
                     >
-                         <View className="modal-container">
+                         <Pressable className="modal-container">
                               <View className="modal-header">
                                    <Text className="modal-title">New Subscription</Text>
                                    <Pressable className="modal-close" onPress={onClose}>
@@ -228,7 +228,7 @@ const CreateSubscriptionModal = ({
                                         </Pressable>
                                    </View>
                               </ScrollView>
-                         </View>
+                         </Pressable>
                     </KeyboardAvoidingView>
                </Pressable>
           </Modal>
