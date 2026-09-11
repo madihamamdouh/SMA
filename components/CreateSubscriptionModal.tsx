@@ -43,11 +43,10 @@ const CreateSubscriptionModal = ({
           setPaymentMethod("Credit Card")
      };
 
-     useEffect(() => {
-          if (!visible) {
-               resetForm();
-          }
-     }, [visible]);
+    const handleClose = ()=>{
+     resetForm();
+     onClose();
+    }
 
      const trimmedName = name.trim();
      const parsedPrice = parseFloat(price);
@@ -87,7 +86,7 @@ const CreateSubscriptionModal = ({
                animationType="slide"
                onRequestClose={onClose}
           >
-               <Pressable className="modal-overlay" onPress={onClose}>
+               <Pressable className="modal-overlay" onPress={handleClose}>
                     <KeyboardAvoidingView
                          behavior={Platform.OS === "ios" ? "padding" : "height"}
                          className="flex-1 justify-end"
@@ -95,7 +94,7 @@ const CreateSubscriptionModal = ({
                          <Pressable className="modal-container">
                               <View className="modal-header">
                                    <Text className="modal-title">New Subscription</Text>
-                                   <Pressable className="modal-close" onPress={onClose}>
+                                   <Pressable className="modal-close" onPress={handleClose}>
                                         <Text className="modal-close-text">×</Text>
                                    </Pressable>
                               </View>
