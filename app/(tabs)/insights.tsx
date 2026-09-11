@@ -79,7 +79,9 @@ const Insights = () => {
                          </View>
                     </View>
 
-                    <ListHeading title="History" onViewAll={() => setShowAllHistory((prev)=> !prev)} />
+                    <ListHeading title="History" 
+                    onViewAll={() => setShowAllHistory((prev)=> !prev)}
+                    actionLabel={showAllHistory? "Show less": "View all"} />
 
                     <View style={{ marginTop: 12 }}>
                          {recentHistory.map((sub) => (

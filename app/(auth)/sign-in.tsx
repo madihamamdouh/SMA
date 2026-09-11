@@ -49,7 +49,7 @@ export default function SignIn() {
           if (signIn.status === "complete") {
                posthog.identify(emailAddress, { email: emailAddress });
                posthog.capture('user_signed_in', { method: 'password' });
-               await signIn.finalize({navigate: handelNavigate});
+               await signIn.finalize({ navigate: handelNavigate });
 
           } else if (signIn.status === "needs_second_factor") {
                setFormError("Please contact Support.");
@@ -68,13 +68,13 @@ export default function SignIn() {
      };
 
      const handleVerify = async () => {
-             setFormError(null);
+          setFormError(null);
           await signIn.mfa.verifyEmailCode({ code });
 
           if (signIn.status === "complete") {
                posthog.identify(emailAddress, { email: emailAddress });
                posthog.capture('user_signed_in', { method: 'mfa_email_code' });
-               await signIn.finalize({navigate:handelNavigate});
+               await signIn.finalize({ navigate: handelNavigate });
           } else {
                // Check why the sign-in is not complete
                console.error("Sign-in attempt not complete:", signIn);
@@ -197,7 +197,7 @@ export default function SignIn() {
                                    <Text className="auth-title">Welcome back</Text>
                                    <Text className="auth-subtitle">Sign in to your account</Text>
                               </View>
-                             {/* sign-in form  */}
+                              {/* sign-in form  */}
                               <View className="auth-card">
                                    <View className="auth-form">
                                         <View className="auth-field">
@@ -247,6 +247,9 @@ export default function SignIn() {
                                              )}
                                              {formError && <Text className="auth-error">{formError}</Text>}
                                         </View>
+                                        {errors.global?.map((e, i) => (
+                                             <Text key={i} className="auth-error">{e.message}</Text>
+                                        ))}
 
                                         <Pressable
                                              className={`auth-button ${(!formValid || fetchStatus === "fetching") && "auth-button-disabled"}`}

@@ -47,7 +47,7 @@ const Settings = () => {
 
      useEffect(() => {
           getReminderPrefs().then(setPrefs).catch(console.error);
-          refreshCount();
+          getScheduledCount().then(setScheduledCount).catch(console.error);
      }, []);
      
      const applyPrefs = async (next: ReminderPref) => {

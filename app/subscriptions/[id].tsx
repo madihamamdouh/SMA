@@ -11,10 +11,10 @@ import {
 import { useAuth } from "@clerk/expo";
 import clsx from "clsx";
 import dayjs from "dayjs";
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import  { useEffect, useMemo, useState } from "react";
 import {
      ActivityIndicator,
      Alert,
@@ -50,7 +50,7 @@ const DetailRow = ({ label, value }: { label: string; value?: string }) => {
 const SubscriptionDetails = () => {
      const { id } = useLocalSearchParams<{ id: string }>();
      const posthog = usePostHog();
-     const { getToken } = useAuth();
+     const { getToken, isSignedIn, isLoaded } = useAuth();
 
      const subscriptions = useSubscriptionStore((s) => s.subscriptions);
      const updateSubscription = useSubscriptionStore((s) => s.updateSubscription);
@@ -67,37 +67,38 @@ const SubscriptionDetails = () => {
      const [isLoading, setIsLoading] = useState(false);
      const [error, setError] = useState<string | null>(null);
      const [isCancelling, setIsCancelling] = useState(false);
-
      const sub = fromStore ?? fetched;
 
-     const loadOne = useCallback(async () => {
+     useEffect(() => {
+          if (fromStore) return;
           if (!id) return;
-          setIsLoading(true);
-          setError(null);
-          try {
-               const token = await getToken();
-               if (!token) return;
-               setFetched(await api.getSubscriptionById(token, id));
-          } catch (err) {
-               setError((err as Error).message);
-          } finally {
-               setIsLoading(false);
-          }
-     }, [id, getToken]);
+          let cancelled = false;
+          (async () => {
+               setFetched(null);
+               setIsLoading(true);
+               setError(null);
+               try {
+                    const token = await getToken();
+                    if (!token || cancelled) return;
+                    const result = await api.getSubscriptionById(token, id);
+                    if (!cancelled) setFetched(result);
+               } catch (err) {
+                    if (!cancelled) setError((err as Error).message);
+               } finally {
+                    if (!cancelled) setIsLoading(false);
+               }
+          })();
 
-     useEffect(() => {
-          if (!fromStore && !fetched) loadOne();
-     }, [fromStore, fetched, loadOne]);
-
-     useEffect(() => {
-          if (id) posthog.capture("subscription_detail_viewed", { subscription_id: id });
-     }, [id, posthog]);
+          return () => {
+               cancelled = true;
+          };
+     }, [id, fromStore, getToken]);
 
      const daysUntilRenewal = useMemo(() => {
           if (!sub?.renewalDate) return null;
           const diff = dayjs(sub.renewalDate).startOf("day").diff(dayjs().startOf("day"), "day");
           return diff >= 0 ? diff : null;
-     }, [sub?.renewalDate]);
+     }, [sub]);
 
      const renewalLabel = useMemo(() => {
           if (sub?.status === "cancelled") return "Cancelled";
@@ -117,10 +118,6 @@ const SubscriptionDetails = () => {
                const updated = await updateSubscription(token, sub.id, { status: newStatus });
                // Keep the cold-open copy in step with the change.
                setFetched((prev) => (prev ? { ...prev, status: newStatus } : prev));
-               posthog.capture("subscription_status_changed", {
-                    subscription_id: sub.id,
-                    status: newStatus,
-               });
                return updated;
           } catch (err) {
                console.error("Failed to update subscription:", err);
@@ -159,6 +156,7 @@ const SubscriptionDetails = () => {
      };
 
      /* ----------------------------- states ----------------------------- */
+     if(isLoaded && !isSignedIn) return <Redirect href="/(auth)/sign-in"/>
 
      if (isLoading && !sub) {
           return (

@@ -3,7 +3,7 @@ import { useAuth, useSignUp } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 import { styled } from "nativewind";
 import { usePostHog } from "posthog-react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
      KeyboardAvoidingView,
      Platform,
@@ -306,6 +306,10 @@ export default function SignUp() {
                                                   </Text>
                                              )}
                                         </View>
+
+                                        {errors.global?.map((e, i) => (
+                                             <Text key={i} className="auth-error">{e.message}</Text>
+                                        ))}
 
                                         <Pressable
                                              className={`auth-button ${(!formValid || fetchStatus === "fetching") && "auth-button-disabled"}`}

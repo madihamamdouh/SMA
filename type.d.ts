@@ -57,6 +57,8 @@ declare global {
 
     interface ListHeadingProps {
         title: string;
+        onViewAll?:()=>void;
+        actionLabel?:string;
     }
 
     interface WeeklyBarChartProps {
@@ -69,10 +71,6 @@ declare global {
     interface BarChartPoint{
      label: string;
      amount: number;
-    }
-    interface ListHeadingProps{
-     title: string;
-     onViewAll?: ()=> void;
     }
     interface UpcomingModalProps{
      visible: boolean;

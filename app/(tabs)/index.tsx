@@ -10,7 +10,6 @@ import { useSubscriptionStore } from "@/lib/subscriptionStore";
 import { calculateMonthlySpend, formatCurrency, getNextRenewalDate } from "@/lib/utils";
 import { useUser, useAuth } from "@clerk/expo";
 import { styled } from "nativewind";
-import { usePostHog } from "posthog-react-native";
 import { useEffect, useMemo, useState } from "react";
 import {
      ActivityIndicator,
@@ -31,7 +30,6 @@ export default function App() {
           Date.parse(sub.createdAt ?? sub.startDate ?? '') || 0
      const { user } = useUser();
      const { getToken } = useAuth();
-     const posthog = usePostHog();
      const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
           string | null>(null);
      const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
@@ -59,15 +57,6 @@ export default function App() {
      }, [subscriptions]);
 
      const handleSubscriptionPress = (item: Subscription) => {
-          const isExpanding = expandedSubscriptionId !== item.id;
-          if (isExpanding) {
-               posthog.capture("subscription_card_expanded", {
-                    subscription_id: item.id,
-                    subscription_name: item.name,
-                    category: item.category ?? null,
-                    billing: item.billing,
-               });
-          }
           setExpandedSubscriptionId((currentId) =>
                currentId === item.id ? null : item.id,
           );
@@ -83,19 +72,12 @@ export default function App() {
                await addSubscription(token, newSubscription);
                if (isFireSubscription) {
                     const granted = await ensureNotificationPermission();
-                    posthog.capture("notification_permission_result", { granted });
                     if (granted) {
                          await syncRenewalReminder(
                               useSubscriptionStore.getState().subscriptions,
                          );
                     }
                }
-               posthog.capture("subscription_created", {
-                    subscription_id: newSubscription.id,
-                    subscription_name: newSubscription.name,
-                    category: newSubscription.category ?? null,
-                    price: newSubscription.price,
-               });
           } catch (err) {
                console.error("Failed to create subscripton:", err);
           }

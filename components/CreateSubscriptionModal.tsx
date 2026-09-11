@@ -1,5 +1,4 @@
 import { guessIconKey } from "@/lib/utils";
-import { posthog } from "@/src/config/posthog";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -76,12 +75,6 @@ const CreateSubscriptionModal = ({
                startDate,
                renewalDate,
                paymentMethod
-          });
-
-          posthog.capture("subscription_created", {
-               subscription_name: name,
-               subsscription_category: category ?? null,
-               subscription_billing: price,
           });
           resetForm();
           onClose();
